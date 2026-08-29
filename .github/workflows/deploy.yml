@@ -9,6 +9,7 @@ jobs:
       - name: legitimate deploy step
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          REGISTRY: ${{ vars.NODE_OPTIONS }}
         run: |
           echo "SECRET_LEN=<${#DEPLOY_KEY}>"
-          echo "NODE_OPTIONS_SEEN=<${NODE_OPTIONS:-unset}>"
+          echo "VAR_FROM_ENVIRONMENT=<${REGISTRY:-unset}>"
