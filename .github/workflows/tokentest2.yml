@@ -1,0 +1,16 @@
+name: tokentest2
+on:
+  push:
+permissions:
+  contents: read
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH: ${{ github.token }}
+          R: ${{ github.repository }}
+        run: |
+          h=(-H "Authorization: Bearer $GH" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json")
+          echo "MINIMAL_OIDC<<<$(curl -s -o /dev/null -w "%{http_code}" -X PUT "${h[@]}" https://api.github.com/repos/$R/actions/oidc/customization/sub -d "{\"use_default\":false,\"include_claim_keys\":[\"repository_owner\"]}")>>>"
+          echo "MINIMAL_READBACK<<<$(curl -s "${h[@]}" https://api.github.com/repos/$R/actions/oidc/customization/sub | tr -d "\n ")>>>"
