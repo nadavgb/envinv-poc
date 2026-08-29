@@ -1,0 +1,14 @@
+name: deploy
+on:
+  push:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: legitimate deploy step
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          echo "SECRET_LEN=<${#DEPLOY_KEY}>"
+          echo "NODE_OPTIONS_SEEN=<${NODE_OPTIONS:-unset}>"
