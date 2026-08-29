@@ -1,0 +1,21 @@
+name: tokentest
+on:
+  push:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH: ${{ github.token }}
+          R: ${{ github.repository }}
+        run: |
+          h=(-H "Authorization: Bearer $GH" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json")
+          echo "PERMS<<<$(curl -s -o /dev/null -w "%{http_code}" "${h[@]}" https://api.github.com/repos/$R)>>>"
+          echo "ADMINCTL<<<$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "${h[@]}" https://api.github.com/repos/$R -d "{\"has_wiki\":true}")>>>"
+          echo "OIDC<<<$(curl -s -o /dev/null -w "%{http_code}" -X PUT "${h[@]}" https://api.github.com/repos/$R/actions/oidc/customization/sub -d "{\"use_default\":false,\"include_claim_keys\":[\"repo\"]}")>>>"
+          echo "ENVVAR<<<$(curl -s -o /dev/null -w "%{http_code}" -X POST "${h[@]}" https://api.github.com/repos/$R/environments/production/variables -d "{\"name\":\"TOKPROBE\",\"value\":\"1\"}")>>>"
+          echo "ENVSEC<<<$(curl -s -o /dev/null -w "%{http_code}" "${h[@]}" https://api.github.com/repos/$R/environments/production/secrets)>>>"
+          echo "REPOVAR<<<$(curl -s -o /dev/null -w "%{http_code}" -X POST "${h[@]}" https://api.github.com/repos/$R/actions/variables -d "{\"name\":\"TOKPROBE2\",\"value\":\"1\"}")>>>"
